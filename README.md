@@ -15,10 +15,10 @@ $repeater = new repeater(1);
 $repeater->addGroup('Wrapper Gruppe');
 
 // Textfeld mit 60% Breite zu "Wrapper Gruppe"  hinzufügen
-$repeater->addText('Titel', 40);
+$repeater->addText('Titel', 60);
 
 // Textarea mit 40% Breite zu "Wrapper Gruppe" hinzufügen
-$repeater->addTextArea('Text', 60);
+$repeater->addTextArea('Text', 40);
 
 // Verschachtelte Gruppe anlegen
 $repeater->addGroup('Verschachtelte Gruppe');
