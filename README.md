@@ -1,5 +1,7 @@
 # REDAXO-Addon: Repeater
 
+## :construction: ACHTUNG: ALPHA-Version - Bitte nur zum Testen benutzen.
+
 REDAXO 5 Addon für eine einfache Wiederholung von Inhalten inenrhalb eines Moduls.
 
 Die Inhalte können auf 2 Ebenen verschachtelt werden.
