@@ -8,6 +8,8 @@ Die Inhalte können auf 2 Ebenen verschachtelt werden.
 
 Alle Felder benötigen einen Namen. Ein zweiter Parameter ermöglicht es eine Feldbreite in Prozent anzugeben.
 
+![Screenshot](https://raw.githubusercontent.com/eaCe/repeater/assets/repeater-alpha.jpg)
+
 Modul-Input:
 ```php
 // Repeater mit einer REX_VALUE-ID von 1 instanziieren
