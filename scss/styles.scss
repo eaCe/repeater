@@ -66,3 +66,67 @@ section.rex-repeater {
     padding-bottom: 1rem;
   }
 }
+
+body.rex-theme-dark {
+  section.rex-repeater {
+    .repeater-group {
+      background-color: #202b35;
+      border: 1px solid #182027;
+
+      &:hover {
+        background-color: #202b35;
+      }
+
+      header {
+        border-bottom: 3px solid #182027;
+      }
+
+      .button {
+        &:hover {
+          background-color: #182027;
+        }
+
+        &.move {
+          color: #aaa;
+        }
+
+        &.remove {
+          color: #d9534f;
+        }
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body.rex-has-theme:not(.rex-theme-light) {
+    section.rex-repeater {
+      .repeater-group {
+        background-color: #202b35;
+        border: 1px solid #182027;
+
+        &:hover {
+          background-color: #202b35;
+        }
+
+        header {
+          border-bottom: 3px solid #182027;
+        }
+
+        .button {
+          &:hover {
+            background-color: #182027;
+          }
+
+          &.move {
+            color: #aaa;
+          }
+
+          &.remove {
+            color: #d9534f;
+          }
+        }
+      }
+    }
+  }
+}
