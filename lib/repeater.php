@@ -121,7 +121,6 @@ class repeater extends repeater_output
     private function checkFieldName()
     {
         if (array_key_exists('group', $this->repeater['group'])) {
-
         } elseif (array_key_exists('group', $this->repeater)) {
         } else {
             $this->throwException('Group missing, please add at least one group.');
