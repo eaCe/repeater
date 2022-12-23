@@ -2,7 +2,7 @@
 
 ## :construction: ACHTUNG: ALPHA-Version - Bitte nur zum Testen benutzen.
 
-REDAXO 5 Addon für eine einfache Wiederholung von Inhalten inenrhalb eines Moduls.
+REDAXO 5 Addon für eine einfache Wiederholung von Inhalten innerhalb eines Moduls.
 
 Die Inhalte können auf 2 Ebenen verschachtelt werden.
 
