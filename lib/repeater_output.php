@@ -1,6 +1,7 @@
 <?php
 
-class repeater_output {
+class repeater_output
+{
     const GROUP = 1;
     const FIELD = 2;
 
@@ -9,7 +10,8 @@ class repeater_output {
     private $initialValues = null;
     private $output = '';
 
-    protected function getOutput(): string {
+    protected function getOutput(): string
+    {
         $this->output .= $this->getLoader();
         $this->output .= $this->getSectionStart();
         $this->getRepeaterObject();
@@ -18,31 +20,35 @@ class repeater_output {
         return $this->output;
     }
 
-    private function getLoader(): string {
+    private function getLoader(): string
+    {
         return '<div class="alpine-loader rex-ajax-loader rex-visible"><div class="rex-ajax-loader-elements"><div class="rex-ajax-loader-element1 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element2 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element3 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element4 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element5 rex-ajax-loader-element"></div></div></div>';
     }
 
-    private function getSectionStart(): string {
+    private function getSectionStart(): string
+    {
 //        $initialValue = htmlspecialchars(rex_article_slice::getArticleSliceById(rex_request::get('slice_id'))->getValue($this->rexVarId));
         $output = '<section class="rex-repeater"><div x-data="repeater()" x-repeater @repeater:ready.once="setInitialValue()" id="x-repeater">';
         $output .= '<template x-if="groups.length"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent="addGroup(0)"><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a></template>';
         return $output;
     }
 
-    private function getSectionEnd(): string {
+    private function getSectionEnd(): string
+    {
         $output = '<a href="#" type="button" class="btn btn-primary" @click.prevent="addGroup(1)"><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a>';
-        $output .= '<textarea name="REX_INPUT_VALUE['.$this->rexVarId.']" class="hidden" cols="1" rows="1" x-bind:value="value">REX_VALUE['.$this->rexVarId.']</textarea>';
+        $output .= '<textarea name="REX_INPUT_VALUE[' . $this->rexVarId . ']" class="hidden" cols="1" rows="1" x-bind:value="value">REX_VALUE[' . $this->rexVarId . ']</textarea>';
         $output .= '</div></section>';
-        $output .= '<script>var initialValues = '.$this->initialValues.'; var repeaterGroup = '.$this->groupDefinition.';var repeaterFields = '.$this->fieldsDefinition.';</script>';
+        $output .= '<script>var initialValues = ' . $this->initialValues . '; var repeaterGroup = ' . $this->groupDefinition . ';var repeaterFields = ' . $this->fieldsDefinition . ';</script>';
         return $output;
     }
 
-    private function getRepeaterObject() {
+    private function getRepeaterObject()
+    {
         $groupDefinition = [];
         $fieldsDefinition = [];
         $initialValues = json_decode(rex_article_slice::getArticleSliceById(rex_request::get('slice_id'))->getValue($this->rexVarId), true);
 
-        if($this->repeater['group'] && array_key_exists('fields', $this->repeater['group'])) {
+        if ($this->repeater['group'] && array_key_exists('fields', $this->repeater['group'])) {
             foreach ($this->repeater['group']['fields'] as $field) {
                 $groupDefinition[$field['name']] = '';
 
@@ -50,16 +56,15 @@ class repeater_output {
                 /**
                  * add any missing fields...
                  */
-                if(is_string($field['name']) && $initialValues) {
+                if (is_string($field['name']) && $initialValues) {
                     foreach ($initialValues as $index => &$values) {
-                        if(!key_exists($field['name'], $values) && $field['name'] !== 'fields') {
-                            if($field['type'] === 'link') {
+                        if (!key_exists($field['name'], $values) && $field['name'] !== 'fields') {
+                            if ($field['type'] === 'link') {
                                 $values[$field['name']] = [
                                     'id' => '',
                                     'name' => '',
                                 ];
-                            }
-                            else {
+                            } else {
                                 $values[$field['name']] = '';
                             }
                         }
@@ -69,38 +74,36 @@ class repeater_output {
 
             $this->output .= '<template x-for="(group, groupIndex) in groups" :key="groupIndex"><div class="repeater-group">';
             $this->getGroupHeader($this->repeater['group']);
-        }
-        else {
+        } else {
             return;
         }
 
-        if($this->depth === 2) {
-            if(array_key_exists('fields', $this->repeater['group']['group'])) {
+        if ($this->depth === 2) {
+            if (array_key_exists('fields', $this->repeater['group']['group'])) {
                 $groupDefinition['fields'] = [];
 
                 foreach ($this->repeater['group']['group']['fields'] as $field) {
-                    if($field['type'] === 'link') {
+                    if ($field['type'] === 'link') {
                         $fieldsDefinition[$field['name']] = [
                             'id' => '',
                             'name' => '',
                         ];
-                    }
-                    else {
+                    } else {
                         $fieldsDefinition[$field['name']] = '';
                     }
 
                     /**
                      * add any missing fields...
                      */
-                    if(is_string($field['name']) && $initialValues) {
+                    if (is_string($field['name']) && $initialValues) {
                         foreach ($initialValues as $index => &$values) {
-                            if(key_exists('fields', $values)) {
+                            if (key_exists('fields', $values)) {
                                 for ($i = 0; $i < count($values['fields']); $i++) {
-                                    if(!key_exists($field['name'], $values['fields'][$i])) {
+                                    if (!key_exists($field['name'], $values['fields'][$i])) {
                                         $values['fields'][$i][$field['name']] = '';
                                     }
 
-                                    if($field['type'] === 'link' && is_string($values['fields'][$i][$field['name']])) {
+                                    if ($field['type'] === 'link' && is_string($values['fields'][$i][$field['name']])) {
                                         $values['fields'][$i][$field['name']] = $fieldsDefinition[$field['name']];
                                     }
                                 }
@@ -123,12 +126,13 @@ class repeater_output {
         $this->initialValues = json_encode($initialValues);
     }
 
-    private function getGroupHeader($group) {
+    private function getGroupHeader($group)
+    {
         $this->output .= '
             <header class="mb-3 pb-3">
                 <div class="container-fluid p-0">
                     <div class="row">
-                        <div class="col-sm-9"><strong>'.$group['title'].'</strong></div>
+                        <div class="col-sm-9"><strong>' . $group['title'] . '</strong></div>
                         <div class="col-sm-3 text-right">
 
                             <template x-if="groupIndex !== 0">
@@ -146,7 +150,7 @@ class repeater_output {
             </header>
             <div>';
 
-        if(isset($group['fields'])) {
+        if (isset($group['fields'])) {
             $this->output .= '<div class="flex-wrapper">';
             foreach ($group['fields'] as $field) {
                 $this->output .= $this->getField($field, self::GROUP);
@@ -155,12 +159,13 @@ class repeater_output {
         }
     }
 
-    private function getFieldsHeader($group) {
+    private function getFieldsHeader($group)
+    {
         $this->output .= '
             <header class="mb-3 pb-3">
                 <div class="container-fluid p-0">
                     <div class="row">
-                        <div class="col-sm-9"><strong>'.$group['title'].'</strong></div>
+                        <div class="col-sm-9"><strong>' . $group['title'] . '</strong></div>
                         <div class="col-sm-3 text-right">
 
                             <template x-if="index !== 0">
@@ -176,7 +181,7 @@ class repeater_output {
                 </div>
             </header>';
 
-        if(isset($group['fields'])) {
+        if (isset($group['fields'])) {
             $this->output .= '<div class="flex-wrapper">';
             foreach ($group['fields'] as $field) {
                 $this->output .= $this->getField($field, self::FIELD);
@@ -185,8 +190,9 @@ class repeater_output {
         }
     }
 
-    private function getField($field, $type): string {
-        $output = '<div class="mb-3 field " '.(isset($field['width']) && $field['width'] ? 'style="width:'.$field['width'].'%;"' : 'style="width:100%;"').'>';
+    private function getField($field, $type): string
+    {
+        $output = '<div class="mb-3 field " ' . (isset($field['width']) && $field['width'] ? 'style="width:' . $field['width'] . '%;"' : 'style="width:100%;"') . '>';
         switch ($field['type']) {
             case 'text':
                 $output .= $this->getTextField($field, $type);
@@ -208,110 +214,113 @@ class repeater_output {
         return $output;
     }
 
-    private function getFieldId($field, $type, $suffix = ''): string {
-        if($type === self::GROUP) {
-            return '\'group-'.$field['name'].'-\'+groupIndex'.$suffix;
-        }
-        elseif($type === self::FIELD) {
-            return '\''.$field['name'].'-\'+groupIndex+\'-\'+index'.$suffix;
-        }
-    }
-
-    private function getFieldModel($field, $type, $suffix = ''): string {
-        if($type === self::GROUP) {
-            return 'group.'.$field['name'].$suffix;
-        }
-        elseif($type === self::FIELD) {
-            return 'field.'.$field['name'].$suffix;
+    private function getFieldId($field, $type, $suffix = ''): string
+    {
+        if ($type === self::GROUP) {
+            return '\'group-' . $field['name'] . '-\'+groupIndex' . $suffix;
+        } elseif ($type === self::FIELD) {
+            return '\'' . $field['name'] . '-\'+groupIndex+\'-\'+index' . $suffix;
         }
     }
 
-    private function getTextField($field, $type): string {
+    private function getFieldModel($field, $type, $suffix = ''): string
+    {
+        if ($type === self::GROUP) {
+            return 'group.' . $field['name'] . $suffix;
+        } elseif ($type === self::FIELD) {
+            return 'field.' . $field['name'] . $suffix;
+        }
+    }
+
+    private function getTextField($field, $type): string
+    {
         $id = $this->getFieldId($field, $type);
-        return '<label :for="'.$id.'">'.$field['title'].'</label>
+        return '<label :for="' . $id . '">' . $field['title'] . '</label>
                 <input type="text"
                        class="form-control"
-                       placeholder="'.$field['title'].'"
-                       x-model="'.$this->getFieldModel($field, $type).'"
+                       placeholder="' . $field['title'] . '"
+                       x-model="' . $this->getFieldModel($field, $type) . '"
                        type="text"
-                       name="'.$field['name'].'[]"
-                       :id="'.$id.'"
+                       name="' . $field['name'] . '[]"
+                       :id="' . $id . '"
                        x-on:change="updateValues()">';
     }
 
-    private function getTextareaField($field, $type): string {
+    private function getTextareaField($field, $type): string
+    {
         $id = $this->getFieldId($field, $type);
-        return '<label :for="'.$id.'">'.$field['title'].'</label>
+        return '<label :for="' . $id . '">' . $field['title'] . '</label>
                 <textarea class="form-control"
-                          name="'.$field['name'].'[]"
-                          placeholder="'.$field['title'].'"
-                          :id="'.$id.'"
-                          x-model="'.$this->getFieldModel($field, $type).'"
+                          name="' . $field['name'] . '[]"
+                          placeholder="' . $field['title'] . '"
+                          :id="' . $id . '"
+                          x-model="' . $this->getFieldModel($field, $type) . '"
                           x-on:change="updateValues()"></textarea>';
     }
 
-    private function getLinkField($field, $type): string {
+    private function getLinkField($field, $type): string
+    {
         $id = $this->getFieldId($field, $type);
         $nameId = $this->getFieldId($field, $type, '+\'_NAME\'');
-        return '<label :for="'.$nameId.'">'.$field['title'].'</label>
+        return '<label :for="' . $nameId . '">' . $field['title'] . '</label>
                 <div class="input-group">
                     <input class="form-control"
                            type="text"
-                           x-model="'.$this->getFieldModel($field, $type, '.name').'"
-                           :id="'.$nameId.'"
+                           x-model="' . $this->getFieldModel($field, $type, '.name') . '"
+                           :id="' . $nameId . '"
                            readonly="">
                     <input type="hidden"
-                           name="'.$field['name'].'[]"
-                           x-model="'.$this->getFieldModel($field, $type, '.id').'"
-                           :id="'.$id.'">
+                           name="' . $field['name'] . '[]"
+                           x-model="' . $this->getFieldModel($field, $type, '.id') . '"
+                           :id="' . $id . '">
                     <span class="input-group-btn">
                         <a href="#"
                            class="btn btn-popup"
-                           @click.prevent="addLink('.$id.', groupIndex, index, \''.$field['name'].'\')"
+                           @click.prevent="addLink(' . $id . ', groupIndex, index, \'' . $field['name'] . '\')"
                            title="Link auswählen"><i class="rex-icon rex-icon-open-linkmap"></i>
                         </a>
                         <a href="#"
                            class="btn btn-popup"
-                           @click.prevent="removeLink(groupIndex, index, \''.$field['name'].'\');return false;"
+                           @click.prevent="removeLink(groupIndex, index, \'' . $field['name'] . '\');return false;"
                            title="Ausgewählten Link löschen"><i class="rex-icon rex-icon-delete-link"></i>
                         </a>
                     </span>
                 </div>';
     }
 
-    private function getMediaField($field, $type): string {
+    private function getMediaField($field, $type): string
+    {
         $imageId = null;
         $id = null;
 
-        if($type === self::GROUP) {
-            $imageId = '\'REX_MEDIA_\'+group-'.$field['name'].'-\'+groupIndex';
-        }
-        elseif($type === self::FIELD) {
-            $imageId = '\'REX_MEDIA_'.$field['name'].'-\'+groupIndex+\'-\'+index';
+        if ($type === self::GROUP) {
+            $imageId = '\'REX_MEDIA_\'+group-' . $field['name'] . '-\'+groupIndex';
+        } elseif ($type === self::FIELD) {
+            $imageId = '\'REX_MEDIA_' . $field['name'] . '-\'+groupIndex+\'-\'+index';
         }
 
-        return '<label :for="'.$imageId.'">Bild</label>
+        return '<label :for="' . $imageId . '">Bild</label>
                 <div class="input-group">
                     <input class="form-control"
                            type="text"
-                           name="'.$field['name'].'"
-                           :id="'.$imageId.'"
+                           name="' . $field['name'] . '"
+                           :id="' . $imageId . '"
                            readonly=""
-                           x-model="field.'.$field['name'].'">
+                           x-model="field.' . $field['name'] . '">
                     <span class="input-group-btn">
                         <a href="#"
                            class="btn btn-popup"
-                           @click.prevent="selectImage(\''.$field['name'].'-\'+groupIndex+\'-\'+index, groupIndex, index, \''.$field['name'].'\')"
+                           @click.prevent="selectImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
                            title="Medium auswählen"><i class="rex-icon rex-icon-open-mediapool"></i></a>
 
                         <a href="#"
                            class="btn btn-popup"
-                           @click.prevent="addImage(\''.$field['name'].'-\'+groupIndex+\'-\'+index, groupIndex, index, \''.$field['name'].'\')"
+                           @click.prevent="addImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
                            title="Neues Medium hinzufügen"><i class="rex-icon rex-icon-add-media"></i></a>
 
                         <a href="#"
                            class="btn btn-popup"
-                           @click.prevent="deleteImage(\''.$field['name'].'-\'+groupIndex+\'-\'+index, groupIndex, index, \''.$field['name'].'\')"
+                           @click.prevent="deleteImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
                            title="Ausgewähltes Medium löschen"><i class="rex-icon rex-icon-delete-media"></i></a>
                     </span>
                 </div>';
