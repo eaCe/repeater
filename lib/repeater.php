@@ -2,7 +2,7 @@
 
 class repeater extends repeater_output
 {
-    protected $rexVarId;
+    public $rexVarId;
     protected $repeater = [];
     private $group = null;
     protected $depth = null;
@@ -26,7 +26,6 @@ class repeater extends repeater_output
 
     public function addGroup($name = 'Group')
     {
-
         if (array_key_exists('group', $this->repeater)) {
             if ($this->depth === 2) {
                 $this->throwException('Maximum depth of nested groups reached. [' . $name . ']');
@@ -43,7 +42,12 @@ class repeater extends repeater_output
         }
     }
 
-    public function addText($name, $width = null)
+    /**
+     * @param $name
+     * @param $width
+     * @return void
+     */
+    public function addText($name, $width = null): void
     {
         $this->addField($name, ['type' => 'text'], $width);
     }
@@ -76,7 +80,7 @@ class repeater extends repeater_output
         }
 
         if ($width) {
-            $this->group['fields'][$fieldName]['width'] = str_replace(',', '.', floatval($width));
+            $this->group['fields'][$fieldName]['width'] = str_replace(',', '.', (float)$width);
         }
 
 //        if(array_key_exists('fields', $this->group)) {

@@ -5,9 +5,9 @@ class repeater_output
     const GROUP = 1;
     const FIELD = 2;
 
-    private $groupDefinition = null;
-    private $fieldsDefinition = null;
-    private $initialValues = null;
+    public $groupDefinition = null;
+    public $fieldsDefinition = null;
+    public $initialValues = null;
     private $output = '';
 
     /**
@@ -28,7 +28,8 @@ class repeater_output
      */
     private function getLoader(): string
     {
-        return '<div class="alpine-loader rex-ajax-loader rex-visible"><div class="rex-ajax-loader-elements"><div class="rex-ajax-loader-element1 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element2 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element3 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element4 rex-ajax-loader-element"></div><div class="rex-ajax-loader-element5 rex-ajax-loader-element"></div></div></div>';
+        $fragment = new \rex_fragment();
+        return $fragment->parse('repeater/loader.php');
     }
 
     /**
@@ -37,9 +38,8 @@ class repeater_output
     private function getSectionStart(): string
     {
 //        $initialValue = htmlspecialchars(rex_article_slice::getArticleSliceById(rex_request::get('slice_id'))->getValue($this->rexVarId));
-        $output = '<section class="rex-repeater"><div x-data="repeater()" x-repeater @repeater:ready.once="setInitialValue()" id="x-repeater">';
-        $output .= '<template x-if="groups.length"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent="addGroup(0)"><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a></template>';
-        return $output;
+        $fragment = new \rex_fragment();
+        return $fragment->parse('repeater/section_start.php');
     }
 
     /**
@@ -47,11 +47,9 @@ class repeater_output
      */
     private function getSectionEnd(): string
     {
-        $output = '<a href="#" type="button" class="btn btn-primary" @click.prevent="addGroup(1)"><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a>';
-        $output .= '<textarea name="REX_INPUT_VALUE[' . $this->rexVarId . ']" class="hidden" cols="1" rows="1" x-bind:value="value">REX_VALUE[' . $this->rexVarId . ']</textarea>';
-        $output .= '</div></section>';
-        $output .= '<script>var initialValues = ' . $this->initialValues . '; var repeaterGroup = ' . $this->groupDefinition . ';var repeaterFields = ' . $this->fieldsDefinition . ';</script>';
-        return $output;
+        $fragment = new \rex_fragment();
+        $fragment->setVar('repeater', $this, false);
+        return $fragment->parse('repeater/section_end.php');
     }
 
     /**
@@ -248,7 +246,7 @@ class repeater_output
      * @param string $suffix
      * @return string
      */
-    private function getFieldId(array $field, int $type, string $suffix = ''): string
+    public function getFieldId(array $field, int $type, string $suffix = ''): string
     {
         if ($type === self::GROUP) {
             return '\'group-' . $field['name'] . '-\'+groupIndex' . $suffix;
@@ -267,7 +265,7 @@ class repeater_output
      * @param string $suffix
      * @return string
      */
-    private function getFieldModel(array $field, int $type, string $suffix = ''): string
+    public function getFieldModel(array $field, int $type, string $suffix = ''): string
     {
         if ($type === self::GROUP) {
             return 'group.' . $field['name'] . $suffix;
@@ -287,16 +285,11 @@ class repeater_output
      */
     private function getTextField(array $field, int $type): string
     {
-        $id = $this->getFieldId($field, $type);
-        return '<label :for="' . $id . '">' . $field['title'] . '</label>
-                <input type="text"
-                       class="form-control"
-                       placeholder="' . $field['title'] . '"
-                       x-model="' . $this->getFieldModel($field, $type) . '"
-                       type="text"
-                       name="' . $field['name'] . '[]"
-                       :id="' . $id . '"
-                       x-on:change="updateValues()">';
+        $fragment = new \rex_fragment();
+        $fragment->setVar('repeater', $this, false);
+        $fragment->setVar('field', $field, false);
+        $fragment->setVar('type', $type, false);
+        return $fragment->parse('repeater/text.php');
     }
 
     /**
@@ -306,14 +299,11 @@ class repeater_output
      */
     private function getTextareaField(array $field, int $type): string
     {
-        $id = $this->getFieldId($field, $type);
-        return '<label :for="' . $id . '">' . $field['title'] . '</label>
-                <textarea class="form-control"
-                          name="' . $field['name'] . '[]"
-                          placeholder="' . $field['title'] . '"
-                          :id="' . $id . '"
-                          x-model="' . $this->getFieldModel($field, $type) . '"
-                          x-on:change="updateValues()"></textarea>';
+        $fragment = new \rex_fragment();
+        $fragment->setVar('repeater', $this, false);
+        $fragment->setVar('field', $field, false);
+        $fragment->setVar('type', $type, false);
+        return $fragment->parse('repeater/textarea.php');
     }
 
     /**
@@ -325,30 +315,14 @@ class repeater_output
     {
         $id = $this->getFieldId($field, $type);
         $nameId = $this->getFieldId($field, $type, '+\'_NAME\'');
-        return '<label :for="' . $nameId . '">' . $field['title'] . '</label>
-                <div class="input-group">
-                    <input class="form-control"
-                           type="text"
-                           x-model="' . $this->getFieldModel($field, $type, '.name') . '"
-                           :id="' . $nameId . '"
-                           readonly="">
-                    <input type="hidden"
-                           name="' . $field['name'] . '[]"
-                           x-model="' . $this->getFieldModel($field, $type, '.id') . '"
-                           :id="' . $id . '">
-                    <span class="input-group-btn">
-                        <a href="#"
-                           class="btn btn-popup"
-                           @click.prevent="addLink(' . $id . ', groupIndex, index, \'' . $field['name'] . '\')"
-                           title="Link auswählen"><i class="rex-icon rex-icon-open-linkmap"></i>
-                        </a>
-                        <a href="#"
-                           class="btn btn-popup"
-                           @click.prevent="removeLink(groupIndex, index, \'' . $field['name'] . '\');return false;"
-                           title="Ausgewählten Link löschen"><i class="rex-icon rex-icon-delete-link"></i>
-                        </a>
-                    </span>
-                </div>';
+
+        $fragment = new \rex_fragment();
+        $fragment->setVar('id', $id, false);
+        $fragment->setVar('nameId', $nameId, false);
+        $fragment->setVar('repeater', $this, false);
+        $fragment->setVar('field', $field, false);
+        $fragment->setVar('type', $type, false);
+        return $fragment->parse('repeater/link.php');
     }
 
     /**
@@ -366,30 +340,11 @@ class repeater_output
             $imageId = '\'REX_MEDIA_' . $field['name'] . '-\'+groupIndex+\'-\'+index';
         }
 
-        return '<label :for="' . $imageId . '">Bild</label>
-                <div class="input-group">
-                    <input class="form-control"
-                           type="text"
-                           name="' . $field['name'] . '"
-                           :id="' . $imageId . '"
-                           readonly=""
-                           x-model="field.' . $field['name'] . '">
-                    <span class="input-group-btn">
-                        <a href="#"
-                           class="btn btn-popup"
-                           @click.prevent="selectImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
-                           title="Medium auswählen"><i class="rex-icon rex-icon-open-mediapool"></i></a>
-
-                        <a href="#"
-                           class="btn btn-popup"
-                           @click.prevent="addImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
-                           title="Neues Medium hinzufügen"><i class="rex-icon rex-icon-add-media"></i></a>
-
-                        <a href="#"
-                           class="btn btn-popup"
-                           @click.prevent="deleteImage(\'' . $field['name'] . '-\'+groupIndex+\'-\'+index, groupIndex, index, \'' . $field['name'] . '\')"
-                           title="Ausgewähltes Medium löschen"><i class="rex-icon rex-icon-delete-media"></i></a>
-                    </span>
-                </div>';
+        $fragment = new \rex_fragment();
+        $fragment->setVar('imageId', $imageId, false);
+        $fragment->setVar('repeater', $this, false);
+        $fragment->setVar('field', $field, false);
+        $fragment->setVar('type', $type, false);
+        return $fragment->parse('repeater/media.php');
     }
 }
