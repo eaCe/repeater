@@ -332,16 +332,16 @@ class repeater_output
      */
     private function getMediaField(array $field, int $type): string
     {
-        $imageId = null;
+        $mediaId = null;
 
         if ($type === self::GROUP) {
-            $imageId = '\'REX_MEDIA_\'+group-' . $field['name'] . '-\'+groupIndex';
+            $mediaId = '\'REX_MEDIA_group-' . $field['name'] . '-\'+groupIndex';
         } elseif ($type === self::FIELD) {
-            $imageId = '\'REX_MEDIA_' . $field['name'] . '-\'+groupIndex+\'-\'+index';
+            $mediaId = '\'REX_MEDIA_' . $field['name'] . '-\'+groupIndex+\'-\'+index';
         }
 
         $fragment = new \rex_fragment();
-        $fragment->setVar('imageId', $imageId, false);
+        $fragment->setVar('mediaId', $mediaId, false);
         $fragment->setVar('repeater', $this, false);
         $fragment->setVar('field', $field, false);
         $fragment->setVar('type', $type, false);

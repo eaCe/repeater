@@ -3251,7 +3251,6 @@ window.repeater = function () {
       this.initialValue = initialValues;
       this.groups = [];
       if (this.initialValue) {
-        console.log('script.js:186', '  ↴', '\n', this.initialValue);
         this.groups = this.initialValue;
         this.value = JSON.stringify(this.groups);
       }
@@ -3279,6 +3278,9 @@ window.repeater = function () {
        */
       $(linkMap).on('rex:selectLink', function (event, linkurl, linktext) {
         if (_this2.groupHasFields(groupIndex)) {
+          if (_typeof(_this2.groups[groupIndex].fields[index][fieldName]) !== 'object') {
+            _this2.groups[groupIndex].fields[index][fieldName] = {};
+          }
           _this2.groups[groupIndex].fields[index][fieldName]['id'] = linkurl.replace('redaxo://', '');
           _this2.groups[groupIndex].fields[index][fieldName]['name'] = linktext;
         } else {
@@ -3302,27 +3304,35 @@ window.repeater = function () {
       }
       this.updateValues();
     },
-    addImage: function addImage(id, groupIndex, index, fieldName) {
+    addMedia: function addMedia(id, groupIndex, index, fieldName) {
       var _this3 = this;
       // eslint-disable-next-line no-undef
       var media = addREXMedia(id);
       $(media).on('rex:selectMedia', function (event, mediaName) {
-        _this3.groups[groupIndex].fields[index][fieldName] = mediaName;
+        if (_this3.groupHasFields(groupIndex)) {
+          _this3.groups[groupIndex].fields[index][fieldName] = mediaName;
+        } else {
+          _this3.groups[groupIndex][fieldName] = mediaName;
+        }
         _this3.updateValues();
       });
       return false;
     },
-    selectImage: function selectImage(id, groupIndex, index, fieldName) {
+    selectMedia: function selectMedia(id, groupIndex, index, fieldName) {
       var _this4 = this;
       // eslint-disable-next-line no-undef
       var media = openREXMedia(id);
       $(media).on('rex:selectMedia', function (event, mediaName) {
-        _this4.groups[groupIndex].fields[index][fieldName] = mediaName;
+        if (_this4.groupHasFields(groupIndex)) {
+          _this4.groups[groupIndex].fields[index][fieldName] = mediaName;
+        } else {
+          _this4.groups[groupIndex][fieldName] = mediaName;
+        }
         _this4.updateValues();
       });
       return false;
     },
-    deleteImage: function deleteImage(id, groupIndex, index, fieldName) {
+    deleteMedia: function deleteMedia(id, groupIndex, index, fieldName) {
       // eslint-disable-next-line no-undef
       deleteREXMedia(id);
       this.groups[groupIndex].fields[index][fieldName] = '';

@@ -153,25 +153,34 @@ window.repeater = () => {
             }
             this.updateValues();
         },
-        addImage(id, groupIndex, index, fieldName) {
+        addMedia(id, groupIndex, index, fieldName) {
             // eslint-disable-next-line no-undef
             const media = addREXMedia(id);
             $(media).on('rex:selectMedia', (event, mediaName) => {
-                this.groups[groupIndex].fields[index][fieldName] = mediaName;
+                if (this.groupHasFields(groupIndex)) {
+                    this.groups[groupIndex].fields[index][fieldName] = mediaName;
+                } else {
+                    this.groups[groupIndex][fieldName] = mediaName;
+                }
                 this.updateValues();
             });
             return false;
         },
-        selectImage(id, groupIndex, index, fieldName) {
+        selectMedia(id, groupIndex, index, fieldName) {
             // eslint-disable-next-line no-undef
             const media = openREXMedia(id);
             $(media).on('rex:selectMedia', (event, mediaName) => {
-                this.groups[groupIndex].fields[index][fieldName] = mediaName;
+                if (this.groupHasFields(groupIndex)) {
+                    this.groups[groupIndex].fields[index][fieldName] = mediaName;
+                } else {
+                    this.groups[groupIndex][fieldName] = mediaName;
+                }
+
                 this.updateValues();
             });
             return false;
         },
-        deleteImage(id, groupIndex, index, fieldName) {
+        deleteMedia(id, groupIndex, index, fieldName) {
             // eslint-disable-next-line no-undef
             deleteREXMedia(id);
             this.groups[groupIndex].fields[index][fieldName] = '';
