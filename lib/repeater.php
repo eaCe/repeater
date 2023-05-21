@@ -4,8 +4,8 @@ class repeater extends repeater_output
 {
     public $rexVarId;
     protected $repeater = [];
-    private $group = null;
-    protected $depth = null;
+    private $group;
+    protected $depth;
 
     /**
      * @throws rex_exception
@@ -21,13 +21,13 @@ class repeater extends repeater_output
 
     private function setRexVar($rexVarId)
     {
-//        $this->output
+        //        $this->output
     }
 
     public function addGroup($name = 'Group')
     {
         if (array_key_exists('group', $this->repeater)) {
-            if ($this->depth === 2) {
+            if (2 === $this->depth) {
                 $this->throwException('Maximum depth of nested groups reached. [' . $name . ']');
                 return;
             }
@@ -42,11 +42,6 @@ class repeater extends repeater_output
         }
     }
 
-    /**
-     * @param $name
-     * @param $width
-     * @return void
-     */
     public function addText($name, $width = null): void
     {
         $this->addField($name, ['type' => 'text'], $width);
@@ -67,7 +62,7 @@ class repeater extends repeater_output
         $this->addField($name, ['type' => 'media'], $width);
     }
 
-    private function addField($name, $params = null, $width)
+    private function addField($name, $params, $width)
     {
         $this->addFields();
         $this->fieldExists($name);
@@ -80,22 +75,22 @@ class repeater extends repeater_output
         }
 
         if ($width) {
-            $this->group['fields'][$fieldName]['width'] = str_replace(',', '.', (float)$width);
+            $this->group['fields'][$fieldName]['width'] = str_replace(',', '.', (float) $width);
         }
 
-//        if(array_key_exists('fields', $this->group)) {
-//            echo '<pre>';
-//            var_dump($this->depth);
-//            echo '</pre>';
-//        }
-//        else if(array_key_exists('group', $this->repeater)) {
-//            echo '<pre>';
-//            var_dump($this->depth);
-//            echo '</pre>';
-//        }
-//        else {
-//            $this->throwException('Group missing, please add at least one group.');
-//        }
+        //        if(array_key_exists('fields', $this->group)) {
+        //            echo '<pre>';
+        //            var_dump($this->depth);
+        //            echo '</pre>';
+        //        }
+        //        else if(array_key_exists('group', $this->repeater)) {
+        //            echo '<pre>';
+        //            var_dump($this->depth);
+        //            echo '</pre>';
+        //        }
+        //        else {
+        //            $this->throwException('Group missing, please add at least one group.');
+        //        }
     }
 
     private function addFields()
@@ -118,7 +113,7 @@ class repeater extends repeater_output
     {
         return [
             'name' => $this->getFieldName($name),
-            'title' => $name
+            'title' => $name,
         ];
     }
 
@@ -143,7 +138,7 @@ class repeater extends repeater_output
 
     public static function getRepeater($rexVarId)
     {
-//        json_decode(html_entity_decode());
+        //        json_decode(html_entity_decode());
     }
 
     /**

@@ -2,17 +2,14 @@
 
 class repeater_output
 {
-    const GROUP = 1;
-    const FIELD = 2;
+    public const GROUP = 1;
+    public const FIELD = 2;
 
-    public $groupDefinition = null;
-    public $fieldsDefinition = null;
-    public $initialValues = null;
+    public $groupDefinition;
+    public $fieldsDefinition;
+    public $initialValues;
     private $output = '';
 
-    /**
-     * @return string
-     */
     protected function getOutput(): string
     {
         $this->output .= $this->getLoader();
@@ -23,28 +20,19 @@ class repeater_output
         return $this->output;
     }
 
-    /**
-     * @return string
-     */
     private function getLoader(): string
     {
         $fragment = new \rex_fragment();
         return $fragment->parse('repeater/loader.php');
     }
 
-    /**
-     * @return string
-     */
     private function getSectionStart(): string
     {
-//        $initialValue = htmlspecialchars(rex_article_slice::getArticleSliceById(rex_request::get('slice_id'))->getValue($this->rexVarId));
+        //        $initialValue = htmlspecialchars(rex_article_slice::getArticleSliceById(rex_request::get('slice_id'))->getValue($this->rexVarId));
         $fragment = new \rex_fragment();
         return $fragment->parse('repeater/section_start.php');
     }
 
-    /**
-     * @return string
-     */
     private function getSectionEnd(): string
     {
         $fragment = new \rex_fragment();
@@ -52,9 +40,6 @@ class repeater_output
         return $fragment->parse('repeater/section_end.php');
     }
 
-    /**
-     * @return void
-     */
     private function getRepeaterObject(): void
     {
         $groupDefinition = [];
@@ -65,14 +50,13 @@ class repeater_output
             foreach ($this->repeater['group']['fields'] as $field) {
                 $groupDefinition[$field['name']] = '';
 
-
                 /**
                  * add any missing fields...
                  */
                 if (is_string($field['name']) && $initialValues) {
                     foreach ($initialValues as $index => &$values) {
-                        if (!key_exists($field['name'], $values) && $field['name'] !== 'fields') {
-                            if ($field['type'] === 'link') {
+                        if (!array_key_exists($field['name'], $values) && 'fields' !== $field['name']) {
+                            if ('link' === $field['type']) {
                                 $values[$field['name']] = [
                                     'id' => '',
                                     'name' => '',
@@ -91,12 +75,12 @@ class repeater_output
             return;
         }
 
-        if ($this->depth === 2) {
+        if (2 === $this->depth) {
             if (array_key_exists('fields', $this->repeater['group']['group'])) {
                 $groupDefinition['fields'] = [];
 
                 foreach ($this->repeater['group']['group']['fields'] as $field) {
-                    if ($field['type'] === 'link') {
+                    if ('link' === $field['type']) {
                         $fieldsDefinition[$field['name']] = [
                             'id' => '',
                             'name' => '',
@@ -111,12 +95,12 @@ class repeater_output
                     if (is_string($field['name']) && $initialValues) {
                         foreach ($initialValues as $index => &$values) {
                             if (array_key_exists('fields', $values)) {
-                                for ($i = 0, $iMax = count($values['fields']); $i < $iMax; $i++) {
+                                for ($i = 0, $iMax = count($values['fields']); $i < $iMax; ++$i) {
                                     if (!array_key_exists($field['name'], $values['fields'][$i])) {
                                         $values['fields'][$i][$field['name']] = '';
                                     }
 
-                                    if ($field['type'] === 'link' && is_string($values['fields'][$i][$field['name']])) {
+                                    if ('link' === $field['type'] && is_string($values['fields'][$i][$field['name']])) {
                                         $values['fields'][$i][$field['name']] = $fieldsDefinition[$field['name']];
                                     }
                                 }
@@ -139,10 +123,6 @@ class repeater_output
         $this->initialValues = json_encode($initialValues);
     }
 
-    /**
-     * @param $group
-     * @return void
-     */
     private function getGroupHeader(array $group): void
     {
         $this->output .= '
@@ -176,10 +156,6 @@ class repeater_output
         }
     }
 
-    /**
-     * @param $group
-     * @return void
-     */
     private function getFieldsHeader(array $group): void
     {
         $this->output .= '
@@ -211,11 +187,6 @@ class repeater_output
         }
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @return string
-     */
     private function getField(array $field, int $type): string
     {
         $output = '<div class="mb-3 field " ' . (isset($field['width']) && $field['width'] ? 'style="width:' . $field['width'] . '%;"' : 'style="width:100%;"') . '>';
@@ -240,49 +211,32 @@ class repeater_output
         return $output;
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @param string $suffix
-     * @return string
-     */
     public function getFieldId(array $field, int $type, string $suffix = ''): string
     {
-        if ($type === self::GROUP) {
+        if (self::GROUP === $type) {
             return '\'group-' . $field['name'] . '-\'+groupIndex' . $suffix;
         }
 
-        if ($type === self::FIELD) {
+        if (self::FIELD === $type) {
             return '\'' . $field['name'] . '-\'+groupIndex+\'-\'+index' . $suffix;
         }
 
         return '';
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @param string $suffix
-     * @return string
-     */
     public function getFieldModel(array $field, int $type, string $suffix = ''): string
     {
-        if ($type === self::GROUP) {
+        if (self::GROUP === $type) {
             return 'group.' . $field['name'] . $suffix;
         }
 
-        if ($type === self::FIELD) {
+        if (self::FIELD === $type) {
             return 'field.' . $field['name'] . $suffix;
         }
 
         return '';
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @return string
-     */
     private function getTextField(array $field, int $type): string
     {
         $fragment = new \rex_fragment();
@@ -292,11 +246,6 @@ class repeater_output
         return $fragment->parse('repeater/text.php');
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @return string
-     */
     private function getTextareaField(array $field, int $type): string
     {
         $fragment = new \rex_fragment();
@@ -306,11 +255,6 @@ class repeater_output
         return $fragment->parse('repeater/textarea.php');
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @return string
-     */
     private function getLinkField(array $field, int $type): string
     {
         $id = $this->getFieldId($field, $type);
@@ -325,18 +269,13 @@ class repeater_output
         return $fragment->parse('repeater/link.php');
     }
 
-    /**
-     * @param array $field
-     * @param int $type
-     * @return string
-     */
     private function getMediaField(array $field, int $type): string
     {
         $mediaId = null;
 
-        if ($type === self::GROUP) {
+        if (self::GROUP === $type) {
             $mediaId = '\'REX_MEDIA_group-' . $field['name'] . '-\'+groupIndex';
-        } elseif ($type === self::FIELD) {
+        } elseif (self::FIELD === $type) {
             $mediaId = '\'REX_MEDIA_' . $field['name'] . '-\'+groupIndex+\'-\'+index';
         }
 
